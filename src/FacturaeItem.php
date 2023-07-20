@@ -117,6 +117,9 @@ class FacturaeItem {
 
     // Process charges and discounts
     $grossAmount = $totalAmountWithoutTax;
+
+    $grossAmount = $fac->pad($grossAmount, 'Item/GrossAmount', Facturae::PRECISION_LINE);
+
     foreach (['discounts', 'charges'] as $i=>$groupTag) {
       $factor = ($i == 0) ? -1 : 1;
       foreach ($this->{$groupTag} as $group) {
@@ -127,6 +130,9 @@ class FacturaeItem {
           $rate = null;
           $amount = $group['amount'];
         }
+
+        $amount = $fac->pad($amount, 'Item/TotalCost', Facturae::PRECISION_LINE);
+
         $addProps[$groupTag][] = array(
           "reason" => $group['reason'],
           "rate" => $rate,
@@ -145,6 +151,10 @@ class FacturaeItem {
         $surcharge = $tax['surcharge'];
         $taxAmount = $grossAmount * ($taxRate / 100);
         $surchargeAmount = $grossAmount * ($surcharge / 100);
+
+        $taxAmount = $fac->pad($taxAmount, 'Item/GrossAmount', Facturae::PRECISION_LINE);
+        $surchargeAmount = $fac->pad($surchargeAmount, 'Item/GrossAmount', Facturae::PRECISION_LINE);
+
         $addProps[$taxesGroup][$type] = array(
           "base" => $grossAmount,
           "rate" => $taxRate,
